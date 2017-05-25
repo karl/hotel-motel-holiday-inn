@@ -1,18 +1,19 @@
 import React, { Component } from 'react';
 
-const sortFields = [
-  { value: 'Distance', label: 'distance' },
-  { value: 'Stars', label: 'stars' },
-  { value: 'MinCost', label: 'minimum cost' },
-  { value: 'UserRating', label: 'user rating' },
+const sortOptions = [
+  { id: 1, field: 'Distance', ascending: true, label: 'distance' },
+  { id: 2, field: 'Stars', descending: false, label: 'stars' },
+  { id: 3, field: 'MinCost', ascending: true, label: 'price (lowest first)' },
+  { id: 4, field: 'MinCost', ascending: false, label: 'price (highest first)' },
+  { id: 5, field: 'UserRating', ascending: false, label: 'user rating' },
 ];
 
 const sortHotels = (hotels, sortBy) => {
   return [...hotels].sort((a, b) => {
-    const valueA = a[sortBy.value];
-    const valueB = b[sortBy.value];
+    const valueA = a[sortBy.field];
+    const valueB = b[sortBy.field];
 
-    return valueA - valueB;
+    return sortBy.ascending ? valueA - valueB : valueB - valueA;
   });
 };
 
@@ -26,7 +27,7 @@ const Hotel = ({ hotel }) => {
         Distance: {hotel.Distance}<br />
         Stars: {hotel.Stars}<br />
         User rating: {hotel.UserRating}<br />
-        MinCost: {hotel.minCost}<br />
+        MinCost: £{hotel.MinCost}<br />
       </div>
     </div>
   );
@@ -38,7 +39,7 @@ class HotelListing extends Component {
     this.state = {
       hotels: [],
       loading: true,
-      sortBy: sortFields[0],
+      sortBy: sortOptions[0],
     };
   }
 
@@ -51,9 +52,9 @@ class HotelListing extends Component {
     });
   }
 
-  handleSortChange(value) {
-    const field = sortFields.find(f => f.value === value);
-    this.setState({ sortBy: field });
+  handleSortChange(id) {
+    const sortBy = sortOptions.find(f => f.id === id);
+    this.setState({ sortBy });
   }
 
   render() {
@@ -64,11 +65,14 @@ class HotelListing extends Component {
         <div>
           Sort by:
           <select
-            value={sortBy.value}
-            onChange={event => this.handleSortChange(event.target.value)}
+            value={sortBy.field}
+            onChange={event =>
+              this.handleSortChange(parseInt(event.target.value, 10))}
           >
-            {sortFields.map(field => (
-              <option key={field.value} value={field.value}>{field.label}</option>
+            {sortOptions.map(option => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
             ))}
           </select>
         </div>
