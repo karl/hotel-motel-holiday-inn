@@ -20,7 +20,7 @@ const sortHotels = (hotels, sortBy) => {
 const filterHotels = (hotels, filter) => {
   return hotels.filter(hotel => {
     return (
-      hotel.Name.includes(filter.name) &&
+      hotel.Name.toLowerCase().includes(filter.name.toLowerCase()) &&
       (filter.stars === undefined || hotel.Stars === filter.stars) &&
       hotel.UserRating >= filter.userRating &&
       (filter.minCost === undefined || hotel.MinCost >= filter.minCost) &&
