@@ -73,7 +73,7 @@ const Filter = ({ filter, onChange }) => {
             onChange({ ...filter, userRating: event.target.value })}
         />
         {' '}
-        <b>{filter.UserRating}</b>
+        <b>{filter.userRating}</b>
       </div>
       <div>
         Price range:
