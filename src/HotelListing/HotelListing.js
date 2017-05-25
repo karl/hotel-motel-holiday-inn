@@ -174,7 +174,7 @@ class HotelListing extends Component {
           <hr />
         </div>
         <div>
-          {sortedHotels.map(hotel => (
+          {sortedHotels.slice(0, 10).map(hotel => (
             <Hotel key={hotel.EstablishmentId} hotel={hotel} />
           ))}
         </div>
