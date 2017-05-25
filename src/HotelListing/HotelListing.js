@@ -17,6 +17,90 @@ const sortHotels = (hotels, sortBy) => {
   });
 };
 
+const filterHotels = (hotels, filter) => {
+  return hotels.filter(hotel => {
+    return (
+      hotel.Name.includes(filter.name) &&
+      (filter.stars === undefined || hotel.Stars === filter.stars) &&
+      hotel.UserRating >= filter.userRating &&
+      (filter.minCost === undefined || hotel.MinCost >= filter.minCost) &&
+      (filter.maxCost === undefined || hotel.MinCost <= filter.maxCost)
+    );
+  });
+};
+
+const toNumber = (value) => {
+  if (value === '') {
+    return undefined;
+  }
+  return Number(value);
+}
+
+const Filter = ({ filter, onChange }) => {
+  return (
+    <div>
+      <h4>Filter</h4>
+      <div>
+        Name:
+        {' '}
+        <input
+          type="text"
+          value={filter.name}
+          onChange={event => onChange({ ...filter, name: event.target.value })}
+        />
+      </div>
+      <div>
+        Stars:
+        {[5, 4, 3, 2, 1].map(numStars => (
+          <button
+            key={numStars}
+            onClick={() => onChange({ ...filter, stars: numStars })}
+          >
+            {numStars}
+          </button>
+        ))}
+      </div>
+      <div>
+        User rating (at least):
+        {' '}
+        <input
+          type="range"
+          min="0"
+          max="10"
+          step="0.1"
+          value={filter.userRating}
+          onChange={event =>
+            onChange({ ...filter, userRating: event.target.value })}
+        />
+        {' '}
+        <b>{filter.UserRating}</b>
+      </div>
+      <div>
+        Price range:
+        Min:
+        {' '}
+        <input
+          type="number"
+          min="0"
+          value={filter.minCost || ''}
+          onChange={event =>
+            onChange({ ...filter, minCost: toNumber(event.target.value) })}
+        />
+        {' '}
+        Max:
+        {' '}
+        <input
+          type="number"
+          min="0"
+          value={filter.maxCost || ''}
+          onChange={event =>
+            onChange({ ...filter, maxCost: toNumber(event.target.value) })}
+        />
+      </div>
+    </div>
+  );
+};
+
 const Hotel = ({ hotel }) => {
   return (
     <div>
@@ -40,6 +124,13 @@ class HotelListing extends Component {
       hotels: [],
       loading: true,
       sortBy: sortOptions[0],
+      filter: {
+        name: '',
+        stars: undefined,
+        userRating: 0,
+        minCost: undefined,
+        maxCost: undefined,
+      },
     };
   }
 
@@ -58,16 +149,21 @@ class HotelListing extends Component {
   }
 
   render() {
-    const { hotels, sortBy } = this.state;
-    const sortedHotels = sortHotels(hotels, sortBy);
+    const { hotels, sortBy, filter } = this.state;
+    const sortedHotels = sortHotels(filterHotels(hotels, filter), sortBy);
     return (
       <div>
+        <Filter
+          filter={filter}
+          onChange={newFilter => this.setState({ filter: newFilter })}
+        />
         <div>
+          <hr />
           Sort by:
           <select
-            value={sortBy.field}
+            value={sortBy.id}
             onChange={event =>
-              this.handleSortChange(parseInt(event.target.value, 10))}
+              this.handleSortChange(Number(event.target.value))}
           >
             {sortOptions.map(option => (
               <option key={option.id} value={option.id}>
@@ -75,6 +171,7 @@ class HotelListing extends Component {
               </option>
             ))}
           </select>
+          <hr />
         </div>
         <div>
           {sortedHotels.map(hotel => (
