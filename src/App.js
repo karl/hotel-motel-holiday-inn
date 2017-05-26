@@ -13,7 +13,7 @@ class App extends Component {
           showMenuIconButton={false}
         />
         <div>
-          <h3 style={{ margin: '1rem' }}>Hotels in Paris</h3>
+          <h3 className={'header'}>Hotels in Paris</h3>
           <HotelListing />
         </div>
       </div>
