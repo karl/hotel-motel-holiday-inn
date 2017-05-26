@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
-import {
-  Card,
-  CardHeader,
-  CardText,
-} from 'material-ui/Card';
+import { Card, CardHeader, CardText } from 'material-ui/Card';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import ToggleStar from 'material-ui/svg-icons/toggle/star';
 import Slider from 'material-ui/Slider';
+import { yellow600 } from 'material-ui/styles/colors';
 
 const sortOptions = [
   { id: 1, field: 'Distance', ascending: true, label: 'Distance' },
@@ -32,7 +29,7 @@ const filterHotels = (hotels, filter) => {
   return hotels.filter(hotel => {
     return (
       hotel.Name.toLowerCase().includes(filter.name.toLowerCase()) &&
-      (filter.stars[hotel.Stars]) &&
+      filter.stars[hotel.Stars] &&
       hotel.UserRating >= filter.userRating &&
       (filter.minCost === undefined || hotel.MinCost >= filter.minCost) &&
       (filter.maxCost === undefined || hotel.MinCost <= filter.maxCost)
@@ -66,9 +63,12 @@ const Filter = ({ filter, onChange }) => {
         <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
           {[5, 4, 3, 2, 1].map(numStars => (
             <Checkbox
+              key={numStars}
               label={
                 <span>
-                  {[...new Array(numStars)].map(() => <ToggleStar />)}
+                  {[...new Array(numStars)].map((value, i) => (
+                    <ToggleStar key={i} color={yellow600} />
+                  ))}
                 </span>
               }
               checked={filter.stars[numStars]}
@@ -81,7 +81,7 @@ const Filter = ({ filter, onChange }) => {
           ))}
         </div>
         <div>
-          User rating (at least) <b>{filter.userRating}</b>
+          User rating (at least) <b>{filter.userRating.toFixed(1)}</b>
           <Slider
             min={0}
             max={10}
@@ -117,13 +117,34 @@ const Filter = ({ filter, onChange }) => {
 const Hotel = ({ hotel }) => {
   return (
     <Card style={{ margin: '1rem' }}>
-      <CardHeader title={hotel.Name} avatar={hotel.ThumbnailUrl} />
-      <CardText>
-        Distance: {hotel.Distance}<br />
-        Stars: {hotel.Stars}<br />
-        User rating: {hotel.UserRating}<br />
-        MinCost: £{hotel.MinCost}<br />
-      </CardText>
+      <div style={{ display: 'flex' }}>
+        <img
+          style={{ flex: '0 0 120px', height: '120', width: '120' }}
+          src={hotel.ThumbnailUrl}
+          alt=""
+        />
+        <div style={{ flex: '1 1 auto', padding: '0.5rem' }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
+            {hotel.Name}
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ flex: '1 0 auto' }}>
+                {[...new Array(hotel.Stars)].map((value, i) => (
+                  <ToggleStar key={i} color={yellow600} />
+                ))}
+              </div>
+              <div>{hotel.Distance.toFixed(1)}mi</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ flex: '1 0 auto' }}>
+                {hotel.UserRating.toFixed(1)} rating
+              </div>
+              <div>£<b>{hotel.MinCost.toFixed(0)}</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </Card>
   );
 };
