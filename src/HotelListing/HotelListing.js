@@ -1,11 +1,22 @@
 import React, { Component } from 'react';
+import {
+  Card,
+  CardHeader,
+  CardText,
+} from 'material-ui/Card';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox';
+import ToggleStar from 'material-ui/svg-icons/toggle/star';
+import Slider from 'material-ui/Slider';
 
 const sortOptions = [
-  { id: 1, field: 'Distance', ascending: true, label: 'distance' },
-  { id: 2, field: 'Stars', descending: false, label: 'stars' },
-  { id: 3, field: 'MinCost', ascending: true, label: 'price (lowest first)' },
-  { id: 4, field: 'MinCost', ascending: false, label: 'price (highest first)' },
-  { id: 5, field: 'UserRating', ascending: false, label: 'user rating' },
+  { id: 1, field: 'Distance', ascending: true, label: 'Distance' },
+  { id: 2, field: 'Stars', descending: false, label: 'Stars' },
+  { id: 3, field: 'MinCost', ascending: true, label: 'Price (lowest first)' },
+  { id: 4, field: 'MinCost', ascending: false, label: 'Price (highest first)' },
+  { id: 5, field: 'UserRating', ascending: false, label: 'Rating' },
 ];
 
 const sortHotels = (hotels, sortBy) => {
@@ -21,7 +32,7 @@ const filterHotels = (hotels, filter) => {
   return hotels.filter(hotel => {
     return (
       hotel.Name.toLowerCase().includes(filter.name.toLowerCase()) &&
-      (filter.stars === undefined || hotel.Stars === filter.stars) &&
+      (filter.stars[hotel.Stars]) &&
       hotel.UserRating >= filter.userRating &&
       (filter.minCost === undefined || hotel.MinCost >= filter.minCost) &&
       (filter.maxCost === undefined || hotel.MinCost <= filter.maxCost)
@@ -29,91 +40,91 @@ const filterHotels = (hotels, filter) => {
   });
 };
 
-const toNumber = (value) => {
+const toNumber = value => {
   if (value === '') {
     return undefined;
   }
   return Number(value);
-}
+};
 
 const Filter = ({ filter, onChange }) => {
   return (
-    <div>
-      <h4>Filter</h4>
-      <div>
-        Name:
-        {' '}
-        <input
-          type="text"
+    <Card>
+      <CardHeader
+        title="Filter"
+        actAsExpander={true}
+        showExpandableButton={true}
+      />
+      <CardText expandable={true}>
+        <TextField
+          hintText="e.g. Disney"
+          fullWidth={true}
+          floatingLabelText="Hotel Name"
           value={filter.name}
-          onChange={event => onChange({ ...filter, name: event.target.value })}
+          onChange={(event, newName) => onChange({ ...filter, name: newName })}
         />
-      </div>
-      <div>
-        Stars:
-        {[5, 4, 3, 2, 1].map(numStars => (
-          <button
-            key={numStars}
-            onClick={() => onChange({ ...filter, stars: numStars })}
-          >
-            {numStars}
-          </button>
-        ))}
-      </div>
-      <div>
-        User rating (at least):
-        {' '}
-        <input
-          type="range"
-          min="0"
-          max="10"
-          step="0.1"
-          value={filter.userRating}
-          onChange={event =>
-            onChange({ ...filter, userRating: event.target.value })}
-        />
-        {' '}
-        <b>{filter.userRating}</b>
-      </div>
-      <div>
-        Price range:
-        Min:
-        {' '}
-        <input
-          type="number"
-          min="0"
-          value={filter.minCost || ''}
-          onChange={event =>
-            onChange({ ...filter, minCost: toNumber(event.target.value) })}
-        />
-        {' '}
-        Max:
-        {' '}
-        <input
-          type="number"
-          min="0"
-          value={filter.maxCost || ''}
-          onChange={event =>
-            onChange({ ...filter, maxCost: toNumber(event.target.value) })}
-        />
-      </div>
-    </div>
+        <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+          {[5, 4, 3, 2, 1].map(numStars => (
+            <Checkbox
+              label={
+                <span>
+                  {[...new Array(numStars)].map(() => <ToggleStar />)}
+                </span>
+              }
+              checked={filter.stars[numStars]}
+              onCheck={(event, isChecked) =>
+                onChange({
+                  ...filter,
+                  stars: { ...filter.stars, [numStars]: isChecked },
+                })}
+            />
+          ))}
+        </div>
+        <div>
+          User rating (at least) <b>{filter.userRating}</b>
+          <Slider
+            min={0}
+            max={10}
+            value={filter.userRating}
+            onChange={(event, newUserRating) =>
+              onChange({ ...filter, userRating: newUserRating })}
+            style={{ marginBottom: '-48px' }}
+          />
+        </div>
+        <div>
+          <TextField
+            type="number"
+            min="0"
+            floatingLabelText="Min price (£)"
+            value={filter.minCost || ''}
+            onChange={(event, newMinCost) =>
+              onChange({ ...filter, minCost: toNumber(newMinCost) })}
+          />
+          <TextField
+            type="number"
+            min="0"
+            floatingLabelText="Max price (£)"
+            value={filter.maxCost || ''}
+            onChange={(event, newMaxCost) =>
+              onChange({ ...filter, maxCost: toNumber(newMaxCost) })}
+          />
+        </div>
+      </CardText>
+    </Card>
   );
 };
 
 const Hotel = ({ hotel }) => {
   return (
-    <div>
-      <h5>{hotel.Name}</h5>
-      <img src={hotel.ThumbnailUrl} alt={hotel.Name} />
-      <div>
-        Location: {hotel.Location}<br />
+    <Card style={{ margin: '1rem' }}>
+      <CardHeader title={hotel.Name} avatar={hotel.ThumbnailUrl} />
+      <CardText>
         Distance: {hotel.Distance}<br />
         Stars: {hotel.Stars}<br />
         User rating: {hotel.UserRating}<br />
         MinCost: £{hotel.MinCost}<br />
-      </div>
-    </div>
+      </CardText>
+    </Card>
   );
 };
 
@@ -126,7 +137,13 @@ class HotelListing extends Component {
       sortBy: sortOptions[0],
       filter: {
         name: '',
-        stars: undefined,
+        stars: {
+          5: true,
+          4: true,
+          3: true,
+          2: true,
+          1: true,
+        },
         userRating: 0,
         minCost: undefined,
         maxCost: undefined,
@@ -157,26 +174,31 @@ class HotelListing extends Component {
           filter={filter}
           onChange={newFilter => this.setState({ filter: newFilter })}
         />
-        <div>
-          <hr />
-          Sort by:
-          <select
+        <div
+          style={{
+            margin: '1rem',
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <SelectField
+            floatingLabelText="Sort by"
             value={sortBy.id}
-            onChange={event =>
-              this.handleSortChange(Number(event.target.value))}
+            onChange={(event, index, value) => this.handleSortChange(value)}
           >
             {sortOptions.map(option => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
+              <MenuItem
+                key={option.id}
+                value={option.id}
+                primaryText={option.label}
+              />
             ))}
-          </select>
-          <hr />
+          </SelectField>
         </div>
         <div>
-          {sortedHotels.slice(0, 10).map(hotel => (
-            <Hotel key={hotel.EstablishmentId} hotel={hotel} />
-          ))}
+          {sortedHotels
+            .slice(0, 10)
+            .map(hotel => <Hotel key={hotel.EstablishmentId} hotel={hotel} />)}
         </div>
       </div>
     );
