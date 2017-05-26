@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
 import Filter from '../Filter';
+import SortBy from '../SortBy';
 import Hotel from '../Hotel';
 
 const sortOptions = [
@@ -82,27 +81,11 @@ class HotelListing extends Component {
           filter={filter}
           onChange={newFilter => this.setState({ filter: newFilter })}
         />
-        <div
-          style={{
-            margin: '1rem',
-            display: 'flex',
-            justifyContent: 'flex-end',
-          }}
-        >
-          <SelectField
-            floatingLabelText="Sort by"
-            value={sortBy.id}
-            onChange={(event, index, value) => this.handleSortChange(value)}
-          >
-            {sortOptions.map(option => (
-              <MenuItem
-                key={option.id}
-                value={option.id}
-                primaryText={option.label}
-              />
-            ))}
-          </SelectField>
-        </div>
+        <SortBy
+          sortOptions={sortOptions}
+          selected={sortBy}
+          onChange={id => this.handleSortChange(id)}
+        />
         <div>
           {results.map(hotel => (
             <Hotel key={hotel.EstablishmentId} hotel={hotel} />
