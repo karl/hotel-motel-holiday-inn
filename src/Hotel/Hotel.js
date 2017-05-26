@@ -8,7 +8,7 @@ const Hotel = ({ hotel }) => {
     <Card style={{ margin: '1rem' }}>
       <div style={{ display: 'flex' }}>
         <img
-          style={{ flex: '0 0 120px', height: '120', width: '120' }}
+          style={{ flex: '0 0 120px', height: '120px', width: '120px' }}
           src={hotel.ThumbnailUrl}
           alt=""
         />
