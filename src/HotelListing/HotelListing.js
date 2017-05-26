@@ -30,6 +30,10 @@ const HotelListing = ({
             <Hotel key={hotel.EstablishmentId} hotel={hotel} />
           ))}
         </div>
+        {hotels.length === 0 &&
+          <div style={{ padding: '3rem', textAlign: 'center'}}>
+            No matching hotels
+          </div>}
       </div>
     </div>
   );
